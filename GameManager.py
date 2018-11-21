@@ -5,7 +5,7 @@ import random
 import time
 import sqlite3
 
-ROUNDS = 0
+ROUNDS = 5
 MAX_AISLES = 3
 MAX_SECTORS = 3
 SECTOR_HEIGHT = 2
@@ -73,6 +73,10 @@ class Leaderboard:
 
 		self._c.execute('CREATE TABLE IF NOT EXISTS {0}(ID INTEGER PRIMARY KEY, Username TEXT, Time_Elapsed REAL)'.format(self._table_name))
 
+	def __del__(self):
+		self._conn.commit()
+		self._conn.close()
+
 	def add_entry(self, username, time_elapsed):
 		self._c.execute('INSERT INTO {0}(Username, Time_Elapsed) VALUES(?, ?)'.format(self._table_name), (username, time_elapsed))
 
@@ -86,9 +90,5 @@ class Leaderboard:
 		for rank in range(0, len(entries)):
 			board += '{0:^5}|{1:<30}|{2:>20.3f}s\n'.format(rank + 1, entries[rank][0], entries[rank][1])
 		return board
-
-	def __del__(self):
-		self._conn.commit()
-		self._conn.close()
 
 		

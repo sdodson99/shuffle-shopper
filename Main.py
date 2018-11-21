@@ -3,61 +3,33 @@ from tkinter import *
 from functools import partial
 
 STORE_NAME = 'Stevenson'
+AISLES = 3
+SECTORS = 4
+SECTOR_HEIGHT = 2
+SECTOR_WIDTH = 2
+WINDOW_WIDTH = 500
+WINDOW_HEIGHT = 600
 
 def show_howto():
-	info = Tk()
-	info.title('How to Play')
-	info.geometry('500x500+500+0')
-	info.resizable(FALSE, FALSE)
-
-	txtHowto = Text(info, wrap=WORD)
-	txtHowto.pack()
-
+	txtInfo['state'] = 'normal'
+	txtInfo.delete(1.0, END)
 	text = game.how_to_play()
-	txtHowto.insert('end', text)
-	txtHowto['state'] = 'disabled'
+	txtInfo.insert('end', text)
+	txtInfo['state'] = 'disabled'
 
 def show_leaderboard():
-	info = Tk()
-	info.title('Top Scores')
-	info.geometry('450x500+500+0')
-	info.resizable(FALSE, FALSE)
-
-	txtBoard = Text(info, wrap=WORD)
-	txtBoard.grid(column=0, row=0, sticky=(N,W,E,S))
-
-	s = Scrollbar(info, orient=VERTICAL, command=txtBoard.yview)
-	s.grid(column=1, row=0, sticky=(N,S))
-
-	txtBoard['yscrollcommand'] = s.set
-
-	info.grid_columnconfigure(0, weight=1)
-	info.grid_rowconfigure(0, weight=1)
-
+	txtInfo['state'] = 'normal'
+	txtInfo.delete(1.0, END)
 	text = leaderboard.display()
-	txtBoard.insert('end', text)
-	txtBoard['state'] = 'disabled'
+	txtInfo.insert('end', text)
+	txtInfo['state'] = 'disabled'
 
 def show_catalog():
-	catalog = Tk()
-	catalog.title('Store Catalog')
-	catalog.geometry('500x500+500+0')
-	catalog.resizable(FALSE, FALSE)
-
-	lstCatalog = Text(catalog)
-	lstCatalog.grid(column=0, row=0, sticky=(N,W,E,S))
-
-	s = Scrollbar(catalog, orient=VERTICAL, command=lstCatalog.yview)
-	s.grid(column=1, row=0, sticky=(N,S))
-
-	lstCatalog['yscrollcommand'] = s.set
-
-	catalog.grid_columnconfigure(0, weight=1)
-	catalog.grid_rowconfigure(0, weight=1)
-
+	txtInfo['state'] = 'normal'
+	txtInfo.delete(1.0, END)
 	lines = game._store.display_catalog()
-	lstCatalog.insert('end', lines)
-	lstCatalog['state'] = 'disabled'
+	txtInfo.insert('end', lines)
+	txtInfo['state'] = 'disabled'
 
 def leaderboard_entry(text, window):
 	leaderboard.add_entry(text.get(), game.elapsed_time)
@@ -67,10 +39,16 @@ def leaderboard_entry(text, window):
 def leaderboard_prompt():
 	username = Tk()
 	username.title('Username')
-	username.geometry('+125+100')
+
+	width = 450
+	height = 100
+	positionRight = int(username.winfo_screenwidth()/2 - width/2)
+	positionDown = int(username.winfo_screenheight()/2 - height/2)
+
+	username.geometry('{}x{}+{}+{}'.format(width, height, positionRight, positionDown))
 	username.resizable(FALSE, FALSE)
 
-	lblPrompt = Label(username, text='Enter a username for the leaderboard:')
+	lblPrompt = Label(username, text='Your time was {0}. Enter a username for the leaderboard:'.format(round(game.elapsed_time, 3)))
 	entName = Entry(username)
 	btnEnter = Button(username, text='Submit', command=partial(leaderboard_entry, entName, username))
 
@@ -80,6 +58,7 @@ def leaderboard_prompt():
 
 def play_game():
 	game.start()
+	show_catalog()
 
 	lblLog['fg'] = 'green'
 	log.set('The game has started!')
@@ -133,18 +112,15 @@ def resetUI():
 	clear_entries()
 	toggle_entries(False)
 
-game = Game(STORE_NAME, 3, 4, 2, 2)
+game = Game(STORE_NAME, AISLES, SECTORS, SECTOR_HEIGHT, SECTOR_WIDTH)
 leaderboard = Leaderboard(STORE_NAME)
 
 window = Tk()
 window.title('Shuffle Shopper')
-window.geometry('500x600')
+positionRight = int(window.winfo_screenwidth()/2 - WINDOW_WIDTH/2)
+positionDown = int(window.winfo_screenheight()/2 - WINDOW_HEIGHT/2)
+window.geometry('{}x{}+{}+{}'.format(WINDOW_WIDTH, WINDOW_HEIGHT, positionRight, positionDown))
 window.resizable(FALSE, FALSE)
-
-btnStart = Button(window, text='Start Game', command=play_game)
-btnCatalog = Button(window, text='Catalog', command=show_catalog)
-btnLeaderboard = Button(window, text='Leaderboard', command=show_leaderboard)
-btnHelp = Button(window, text='How to Play', command=show_howto)
 
 current_round = StringVar()
 current_round.set('Round #:')
@@ -152,10 +128,12 @@ target_item = StringVar()
 target_item.set('Item:')
 aisle = StringVar()
 sector = StringVar()
-name = StringVar()
-name.set('test')
 log = StringVar()
 
+btnStart = Button(window, text='Start Game', command=play_game)
+btnCatalog = Button(window, text='Catalog', command=show_catalog)
+btnLeaderboard = Button(window, text='Leaderboard', command=show_leaderboard)
+btnHelp = Button(window, text='How to Play', command=show_howto)
 lblRound = Label(window, textvariable=current_round)
 lblTargetItem = Label(window, textvariable=target_item)
 lblAisle = Label(window, text='Aisle:')
@@ -164,19 +142,30 @@ lblSector = Label(window, text='Sector:')
 entSector = Entry(window, width='5', textvariable=sector, state='readonly')
 btnSubmit = Button(window, text='Submit', command=submit, state=DISABLED)
 lblLog = Label(window, width='50', textvariable=log)
+frmInfo = Frame(window, borderwidth=2, relief='sunken', width=500, height=400)
+txtInfo = Text(frmInfo, wrap=WORD, state='disabled')
+scrInfo = Scrollbar(frmInfo, orient=VERTICAL, command=txtInfo.yview)
+
+frmInfo.grid_propagate(0)
+txtInfo['yscrollcommand'] = scrInfo.set
 
 btnStart.grid(padx=15, pady=10, row=0, column=0, sticky=(N,W,E,S))
 btnCatalog.grid(padx=15, pady=10, row=1, column=0, sticky=(N,W,E,S))
 btnLeaderboard.grid(padx=15, pady=10, row=2, column=0, sticky=(N,W,E,S))
 btnHelp.grid(padx=15, pady=10, row=3, column=0, sticky=(N,W,E,S))
-
 lblRound.grid(padx=25, row=0, column=1, columnspan=3, sticky=W)
 lblTargetItem.grid(padx=25, row=1, column=1, columnspan=3, sticky=W)
 lblAisle.grid(padx=25, row=2, column=1, sticky=W)
-entAisle.grid(row=2, column=2)
+entAisle.grid(row=2, column=2,sticky=W)
 lblSector.grid(padx=25, row=3, column=1, sticky=W)
-entSector.grid(row=3, column=2)
-btnSubmit.grid(padx=15, row=3, column=3, columnspan=1)
-lblLog.grid(padx=15, row=4, column=0, columnspan=4)
+entSector.grid(row=3, column=2, sticky=W)
+btnSubmit.grid(padx=15, row=3, column=3, columnspan=1, sticky=W)
+lblLog.grid(row=4, column=0, columnspan=4)
+frmInfo.grid(row=5, column=0, columnspan=4)
+txtInfo.grid(column=0, row=0, sticky=(N,W,E,S))
+scrInfo.grid(column=1, row=0, sticky=(N,S))
+
+frmInfo.grid_columnconfigure(0, weight=1)
+frmInfo.grid_rowconfigure(0, weight=1)
 
 window.mainloop()

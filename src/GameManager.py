@@ -1,19 +1,13 @@
-from Store import Store
+from Store import RandomStore
 import Item
 import random
 
 import time
 import sqlite3
 
-ROUNDS = 5
-MAX_AISLES = 3
-MAX_SECTORS = 3
-SECTOR_HEIGHT = 2
-SECTOR_WIDTH = 2
-
 class Game:
-	def __init__(self, name, max_aisles=MAX_AISLES, max_sectors=MAX_SECTORS, sector_height=SECTOR_HEIGHT, sector_width=SECTOR_WIDTH, rounds=ROUNDS):
-		self._store = Store(name, max_aisles, max_sectors, sector_height, sector_width)
+	def __init__(self, name, max_aisles, max_sectors, sector_height, sector_width, rounds):
+		self._store = RandomStore(name, max_aisles, max_sectors, sector_height, sector_width)
 		self.max_rounds = rounds
 
 		self._running = False
@@ -55,6 +49,7 @@ Good luck and have fun!'''
 	def generate_item(self):
 		self.item = self._store.get_random_item()
 
+	#check if aisle and sector both match location of current item
 	def is_correct(self, aisle, sector):
 		return (aisle == str(self.item._location._aisle)) and (sector == str(self.item._location._sector))
 

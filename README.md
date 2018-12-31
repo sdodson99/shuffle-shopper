@@ -13,3 +13,10 @@ Shuffle Shopper is a grocery store simulation game based on finding random items
 * You must scroll through the catalog, find the name of the random item, and enter the aisle and sector associated with that certain item
 * You will continue to be presented with random items until all rounds are completed
 * When all rounds are completed, you will be displayed the time it took to complete the rounds and prompted to enter a name to submit to the leaderboard
+
+### Controls
+* F1: Toggle fullscreen
+* Escape: Exit program
+* Enter: Submit game round
+
+

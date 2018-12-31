@@ -1,9 +1,12 @@
+import random
+
 class Item:
 	def __init__(self, item_location, item_data=['', 'Empty']):
 		self._name = item_data[0]
 		self._brand = item_data[1]
 		self._location = item_location
 
+	#items are equal if name and locations match
 	def __eq__(self, other):
 		if isinstance(other, Item):
 			return (self._location == other._location and self.get_display_name() == other.get_display_name())
@@ -18,12 +21,14 @@ class ItemLocation:
 		self._aisle = aisle
 		self._sector = sector
 
+	#item locations are equal if sector and aisle match
 	def __eq__(self, other):
 		if isinstance(other, ItemLocation):
 			return (self._aisle == other._aisle and self._sector == other._sector)
 		else:
 			return False
 
+#all possible items and brands of those items that can appear in a store
 ITEM_DATA = [
 {'name':'Mayonnaise', 'brands':{"Hellman's", 'Kraft', "Duke's"}},
 {'name':'Coffee', 'brands':{'Maxwell House', 'Green Mountain', 'Folgers', 'McCafe'}},
@@ -44,10 +49,15 @@ ITEM_DATA = [
 {'name':'Nuts', 'brands':{'Emerald', 'Planters', 'Blue Diamond'}}
 ]
 
-def get_random_item_data(index, item_list):
+#pop random name, brand combo from list with structure of ITEM_DATA list
+def get_random_item_data(item_list):
+	index = random.randint(0, len(item_list) - 1)
+
 	name = item_list[index]['name']
+	#popping from brands will return random brand since brands is a set
 	brand = item_list[index]['brands'].pop()
 
+	#if there are no more brands left, remove entire item from list
 	if len(item_list[index]['brands']) == 0:
 		del item_list[index]
 

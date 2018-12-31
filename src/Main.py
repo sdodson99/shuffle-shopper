@@ -68,6 +68,7 @@ def play_game():
 	clear_entries()
 
 def submit():
+	#check if submitted aisle and sector match current item of game
 	if game.is_correct(aisle.get(), sector.get()):
 		lblLog['fg'] = 'green'
 		log.set('Correct!')
@@ -76,6 +77,7 @@ def submit():
 		clear_entries()
 		game.new_round()
 
+		#game will only have an elapsed time if all rounds have been completed
 		if game.elapsed_time:
 			log.set('The game has ended. Time: ' + str(round(game.elapsed_time, 3)))
 			leaderboard_prompt()
@@ -174,7 +176,6 @@ if __name__ == '__main__':
 	txtInfo = Text(frmInfo, wrap=WORD, state='disabled')
 	scrInfo = Scrollbar(frmInfo, orient=VERTICAL, command=txtInfo.yview)
 	txtInfo['yscrollcommand'] = scrInfo.set
-	show_howto()
 
 	frmMain.pack(expand=True)
 	frmInfo.grid_propagate(0)
@@ -195,5 +196,7 @@ if __name__ == '__main__':
 	scrInfo.grid(column=1, row=0, sticky=(N,S))
 	frmInfo.grid_columnconfigure(0, weight=1)
 	frmInfo.grid_rowconfigure(0, weight=1)
+
+	show_howto()
 
 	window.mainloop()

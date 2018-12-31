@@ -79,6 +79,7 @@ class Leaderboard:
 
 	def add_entry(self, username, time_elapsed):
 		self._c.execute('INSERT INTO {0}(Username, Time_Elapsed) VALUES(?, ?)'.format(self._table_name), (username, time_elapsed))
+		self._conn.commit()
 
 	def display(self):
 		self._c.execute('SELECT Username, Time_Elapsed FROM {0} ORDER BY Time_Elapsed'.format(self._table_name))
